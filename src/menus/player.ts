@@ -3,7 +3,7 @@
  */
 
 import readline from 'readline';
-import { fmtDuration, progressBar } from '../display';
+import { progressBar } from '../display';
 import type { PlexClient } from '../api';
 import type { PlexTimeline } from '../types';
 
