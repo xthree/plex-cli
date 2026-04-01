@@ -1,25 +1,15 @@
-# Python
-__pycache__/
-*.py[cod]
-*.pyo
-*.pyd
-.Python
-*.egg
-*.egg-info/
+# Node.js
+node_modules/
+npm-debug.log*
+.npm
+
+# Build artifacts
 dist/
-build/
-.eggs/
-*.whl
+*.js.map
 
-# Virtual environments
-.venv/
-venv/
-env/
-
-# Pytest
-.pytest_cache/
-.coverage
-htmlcov/
+# Test coverage
+coverage/
+.nyc_output/
 
 # Editor
 .vscode/
@@ -30,6 +20,6 @@ htmlcov/
 # macOS
 .DS_Store
 
-# Secrets / local config (never commit real tokens)
+# Secrets / local config
 .env
 *.env.local

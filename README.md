@@ -1,40 +1,35 @@
 # plex-cli
 
-An interactive (or scriptable) CLI for your Plex Media Server.
+An interactive (or scriptable) CLI for your Plex Media Server, built with Node.js.
 
 ## Features
 
 - **Interactive menus** – navigate with arrow keys; every screen has a *Back* option
-- **Search media** – full-text search across all libraries with results in a Rich table
+- **Search media** – full-text search across all libraries with results in a table
 - **Browse libraries** – page through any library section
 - **On Deck** – pick up where you left off
 - **Recently Added** – see what's new
 - **Active Sessions** – see who's watching what and their progress
-- **Client control** – list all clients, play/pause/stop, seek, skip, volume
-- **Live player view** – full-screen progress bar with keyboard controls (`p` pause, `s` stop, `←/→` skip 30 s, `↑/↓` volume, `q` quit)
+- **Client control** – list all clients, play/pause/stop, seek, skip ±30 s, volume
+- **Live player view** – progress bar with keyboard controls (`p` pause, `s` stop, `←/→` seek ±30 s, `↑/↓` volume, `q` quit)
 - **Playlists** – list, browse items, create, and add media to playlists
-- **Metadata browser** – rich metadata panel with summary, cast, genres, etc.
+- **Metadata browser** – rich panel with summary, cast, genres, etc.
 - **Scrobble** – mark items as watched / unwatched
 - **Similar & Extras** – discover related content and bonus material
 - **Server info** – platform, version, machine identifier
-- **Profile management** – save multiple server profiles (stored in `~/.config/plex-cli/config.json`)
+- **Profile management** – save multiple server profiles
 - **Scriptable sub-commands** – use flags or environment variables for automation
 
 ## Requirements
 
-- Python ≥ 3.10
+- Node.js ≥ 18
 - A Plex Media Server with a [Plex token](https://support.plex.tv/articles/204059436/)
 
 ## Installation
 
 ```bash
-pip install .
-```
-
-Or in editable / development mode:
-
-```bash
-pip install -e ".[dev]"
+npm install
+npm link   # makes plex-cli available on your PATH
 ```
 
 ## Usage
@@ -64,14 +59,14 @@ plex-cli sessions
 ### Scriptable sub-commands
 
 ```
-plex-cli search "The Dark Knight"          # search all libraries
-plex-cli clients                           # list clients
-plex-cli sessions                          # active sessions
-plex-cli on-deck                           # continue watching
-plex-cli recently-added --limit 10        # recent additions
-plex-cli libraries                         # list library sections
-plex-cli playlists                         # list playlists
-plex-cli server-info                       # server details
+plex-cli search "The Dark Knight"       # search all libraries
+plex-cli clients                        # list clients
+plex-cli sessions                       # active sessions
+plex-cli on-deck                        # continue watching
+plex-cli recently-added --limit 10     # recent additions
+plex-cli libraries                      # list library sections
+plex-cli playlists                      # list playlists
+plex-cli server-info                    # server details
 ```
 
 Every sub-command accepts `--help` for details.
@@ -80,12 +75,6 @@ Every sub-command accepts `--help` for details.
 
 ```bash
 plex-cli --profile home sessions
-```
-
-### Managing profiles
-
-```bash
-plex-cli          # enter interactive mode → ⚙️  Manage profiles
 ```
 
 ## Interactive menu map
@@ -119,6 +108,6 @@ Media sub-menu
 ## Development
 
 ```bash
-pip install -e ".[dev]"
-pytest
+npm install
+npm test
 ```
