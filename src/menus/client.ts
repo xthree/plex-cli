@@ -125,9 +125,20 @@ export async function runClientMenu(client: PlexClient, plexClient: PlexClientDe
 export function parseTime(s: string): number {
   s = s.trim();
   if (s.includes(':')) {
-    const parts = s.split(':').map(Number);
-    if (parts.length === 2) return (parts[0] * 60 + parts[1]) * 1000;
-    if (parts.length === 3) return (parts[0] * 3600 + parts[1] * 60 + parts[2]) * 1000;
+    const parts = s.split(':').map((p) => Number(p.trim()));
+    if (!parts.every((p) => Number.isFinite(p) && Number.isInteger(p) && p >= 0)) {
+      throw new Error(`Cannot parse time: ${s}`);
+    }
+    if (parts.length === 2) {
+      const [mm, ss] = parts;
+      if (ss > 59) throw new Error(`Cannot parse time: ${s}`);
+      return (mm * 60 + ss) * 1000;
+    }
+    if (parts.length === 3) {
+      const [hh, mm, ss] = parts;
+      if (mm > 59 || ss > 59) throw new Error(`Cannot parse time: ${s}`);
+      return (hh * 3600 + mm * 60 + ss) * 1000;
+    }
     throw new Error(`Cannot parse time: ${s}`);
   }
   const n = parseInt(s, 10);
