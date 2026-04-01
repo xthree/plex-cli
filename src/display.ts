@@ -62,17 +62,29 @@ export function fmtItemLabel(item: PlexItem): string {
 // Tables
 // ---------------------------------------------------------------------------
 
+// Fixed column widths: # (5) + Type (16) + Year (7) + Duration (10) + Watched (9) + Rating (8)
+// Plus 8 border/padding chars (one per column boundary including outer edges).
+const FIXED_COLS_WIDTH = 5 + 16 + 7 + 10 + 9 + 8 + 8;
+const MIN_TITLE_COL_WIDTH = 20;
+const FALLBACK_TERMINAL_WIDTH = 100;
+
+function titleColWidth(): number {
+  const termWidth = process.stdout.columns ?? FALLBACK_TERMINAL_WIDTH;
+  return Math.max(MIN_TITLE_COL_WIDTH, termWidth - FIXED_COLS_WIDTH);
+}
+
 export function mediaTable(items: PlexItem[], title = ''): void {
   if (title) {
     console.log('\n' + chalk.cyan.bold(title));
   }
+  const titleWidth = titleColWidth();
   const table = new Table({
     head: ['#', 'Title', 'Type', 'Year', 'Duration', 'Watched', 'Rating'],
-    colWidths: [5, 36, 16, 7, 10, 9, 8],
+    colWidths: [5, titleWidth, 16, 7, 10, 9, 8],
     style: { head: ['cyan'] },
   });
   items.forEach((item, i) => {
-    const itemTitle = fmtItemLabel(item).substring(0, 33);
+    const itemTitle = fmtItemLabel(item).substring(0, titleWidth - 3);
     const rating = item.rating ?? item.userRating ?? '';
     let ratingStr = '';
     if (rating !== '' && rating != null) {
