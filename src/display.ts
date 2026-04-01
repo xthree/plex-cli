@@ -50,6 +50,14 @@ export function fmtWatched(item: PlexItem): string {
   return '';
 }
 
+export function fmtItemLabel(item: PlexItem): string {
+  const t = item.title ?? item.name ?? '(no title)';
+  if (item.type === 'episode' && item.grandparentTitle) {
+    return `${item.grandparentTitle} – ${t}`;
+  }
+  return t;
+}
+
 // ---------------------------------------------------------------------------
 // Tables
 // ---------------------------------------------------------------------------
@@ -64,7 +72,7 @@ export function mediaTable(items: PlexItem[], title = ''): void {
     style: { head: ['cyan'] },
   });
   items.forEach((item, i) => {
-    const itemTitle = (item.title ?? item.name ?? '(no title)').substring(0, 33);
+    const itemTitle = fmtItemLabel(item).substring(0, 33);
     const rating = item.rating ?? item.userRating ?? '';
     let ratingStr = '';
     if (rating !== '' && rating != null) {
@@ -134,8 +142,10 @@ export function sessionTable(sessions: PlexSession[]): void {
 
 export function metadataPanel(item: PlexItem): void {
   const title = item.title ?? '?';
+  const showName = item.type === 'episode' && item.grandparentTitle ? item.grandparentTitle : null;
   const tagline = item.tagline as string | undefined;
   const lines: string[] = [
+    ...(showName ? [chalk.dim(showName)] : []),
     chalk.yellow.bold(title),
     ...(tagline ? [chalk.italic(tagline)] : []),
     '',

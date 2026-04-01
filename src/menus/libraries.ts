@@ -3,7 +3,7 @@
  */
 
 import inquirer from 'inquirer';
-import { mediaTable, printError, printInfo, printHeader } from '../display';
+import { mediaTable, printError, printInfo, printHeader, fmtItemLabel } from '../display';
 import { runMediaMenu } from './media';
 import type { PlexClient } from '../api';
 import type { PlexItem, PlexLibrary } from '../types';
@@ -64,7 +64,7 @@ async function browseLibrary(client: PlexClient, lib: PlexLibrary): Promise<void
 
     type NavValue = PlexItem | '__prev__' | '__next__' | '__back__';
     const navChoices: Array<{ name: string; value: NavValue }> = items.map((it) => ({
-      name: it.title ?? '?',
+      name: fmtItemLabel(it),
       value: it as NavValue,
     }));
     if (offset > 0) navChoices.unshift({ name: '← Previous page', value: '__prev__' });

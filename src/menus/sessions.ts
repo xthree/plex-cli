@@ -3,7 +3,7 @@
  */
 
 import inquirer from 'inquirer';
-import { sessionTable, mediaTable, printError, printInfo, printHeader } from '../display';
+import { sessionTable, mediaTable, printError, printInfo, printHeader, fmtItemLabel } from '../display';
 import { runMediaMenu } from './media';
 import type { PlexClient } from '../api';
 import type { PlexItem } from '../types';
@@ -68,7 +68,7 @@ export async function runRecentlyAddedMenu(client: PlexClient): Promise<void> {
       name: 'chosen',
       message: 'Select an item:',
       choices: [
-        ...items.map((it) => ({ name: it.title ?? '?', value: it })),
+        ...items.map((it) => ({ name: fmtItemLabel(it), value: it })),
         { name: '← Back', value: null },
       ],
     },
