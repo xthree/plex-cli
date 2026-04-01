@@ -4,7 +4,7 @@
 
 import axios from 'axios';
 import MockAdapter from 'axios-mock-adapter';
-import { PlexClient, PlexAPIError } from '../src/api.js';
+import { PlexClient, PlexAPIError } from '../src/api';
 
 let mock: MockAdapter;
 let client: PlexClient;

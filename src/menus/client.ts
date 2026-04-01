@@ -3,10 +3,10 @@
  */
 
 import inquirer from 'inquirer';
-import { printError, printSuccess, printInfo, printHeader, fmtDuration } from '../display.js';
-import { runPlayerView } from './player.js';
-import type { PlexClient } from '../api.js';
-import type { PlexClientDevice } from '../types.js';
+import { printError, printSuccess, printInfo, printHeader, fmtDuration } from '../display';
+import { runPlayerView } from './player';
+import type { PlexClient } from '../api';
+import type { PlexClientDevice } from '../types';
 
 export async function runClientMenu(client: PlexClient, plexClient: PlexClientDevice): Promise<void> {
   const name = plexClient.name ?? plexClient.title ?? '?';

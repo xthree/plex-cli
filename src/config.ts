@@ -4,7 +4,7 @@
  */
 
 import Conf from 'conf';
-import type { Profile, Store } from './types.js';
+import type { Profile, Store } from './types';
 
 type ProfileMap = Record<string, Profile>;
 

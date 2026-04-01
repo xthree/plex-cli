@@ -10,9 +10,9 @@ import {
   printSuccess,
   printInfo,
   printHeader,
-} from '../display.js';
-import type { PlexClient } from '../api.js';
-import type { PlexItem, PlexClientDevice } from '../types.js';
+} from '../display';
+import type { PlexClient } from '../api';
+import type { PlexItem, PlexClientDevice } from '../types';
 
 async function chooseClient(client: PlexClient): Promise<PlexClientDevice | null> {
   let clients: PlexClientDevice[];

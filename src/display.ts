@@ -4,7 +4,7 @@
 
 import chalk from 'chalk';
 import Table from 'cli-table3';
-import type { PlexItem, PlexClientDevice, PlexSession } from './types.js';
+import type { PlexItem, PlexClientDevice, PlexSession } from './types';
 
 // ---------------------------------------------------------------------------
 // Formatting helpers

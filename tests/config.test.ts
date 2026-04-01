@@ -2,8 +2,8 @@
  * Tests for Config using an in-memory store.
  */
 
-import { Config } from '../src/config.js';
-import type { Store } from '../src/types.js';
+import { Config } from '../src/config';
+import type { Store } from '../src/types';
 
 type StoreData = Record<string, unknown>;
 

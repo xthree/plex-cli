@@ -3,10 +3,10 @@
  */
 
 import inquirer from 'inquirer';
-import { mediaTable, printError, printInfo, printHeader } from '../display.js';
-import { runMediaMenu } from './media.js';
-import type { PlexClient } from '../api.js';
-import type { PlexItem, PlexLibrary } from '../types.js';
+import { mediaTable, printError, printInfo, printHeader } from '../display';
+import { runMediaMenu } from './media';
+import type { PlexClient } from '../api';
+import type { PlexItem, PlexLibrary } from '../types';
 
 const PAGE_SIZE = 20;
 

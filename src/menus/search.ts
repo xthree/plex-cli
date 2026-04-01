@@ -3,11 +3,11 @@
  */
 
 import inquirer from 'inquirer';
-import { mediaTable, clientTable, printError, printInfo, printHeader } from '../display.js';
-import { runMediaMenu } from './media.js';
-import { runClientMenu } from './client.js';
-import type { PlexClient } from '../api.js';
-import type { PlexItem, PlexClientDevice } from '../types.js';
+import { mediaTable, clientTable, printError, printInfo, printHeader } from '../display';
+import { runMediaMenu } from './media';
+import { runClientMenu } from './client';
+import type { PlexClient } from '../api';
+import type { PlexItem, PlexClientDevice } from '../types';
 
 export async function runSearchMedia(client: PlexClient): Promise<void> {
   printHeader('Search Media');

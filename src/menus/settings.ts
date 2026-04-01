@@ -5,9 +5,9 @@
 import inquirer from 'inquirer';
 import Table from 'cli-table3';
 import chalk from 'chalk';
-import { printError, printSuccess, printHeader } from '../display.js';
-import type { PlexClient } from '../api.js';
-import type { Config } from '../config.js';
+import { printError, printSuccess, printHeader } from '../display';
+import type { PlexClient } from '../api';
+import type { Config } from '../config';
 
 export async function runServerInfo(client: PlexClient): Promise<void> {
   printHeader('Server Info');
@@ -43,7 +43,7 @@ export async function runProfileManager(config: Config): Promise<void> {
     const defaultProfile = config.defaultProfile;
 
     type ActionValue = { action: 'select'; name: string } | { action: 'add' | 'delete' | 'back' };
-    const choices: Array<{ name: string; value: ActionValue } | ReturnType<typeof inquirer.Separator>> = [
+    const choices: Array<{ name: string; value: ActionValue } | InstanceType<typeof inquirer.Separator>> = [
       ...profiles.map((name) => ({
         name: `  ${name}${name === defaultProfile ? ' [default]' : ''}`,
         value: { action: 'select' as const, name },
