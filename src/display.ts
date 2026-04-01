@@ -62,9 +62,9 @@ export function fmtItemLabel(item: PlexItem): string {
 // Tables
 // ---------------------------------------------------------------------------
 
-// Fixed column widths: # (5) + Type (16) + Year (7) + Duration (10) + Watched (9) + Rating (8)
-// Plus 8 border/padding chars (one per column boundary including outer edges).
-const FIXED_COLS_WIDTH = 5 + 16 + 7 + 10 + 9 + 8 + 8;
+// Sum of all fixed column widths: # (5) + Type (16) + Year (7) + Duration (10) + Watched (9) + Rating (8)
+// plus 8 chars for the table borders (one per column boundary including outer left/right edges).
+const FIXED_COLS_WIDTH = 5 + 16 + 7 + 10 + 9 + 8 + 8; // columns (63) + borders (8)
 const MIN_TITLE_COL_WIDTH = 20;
 const FALLBACK_TERMINAL_WIDTH = 100;
 
