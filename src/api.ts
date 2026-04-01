@@ -10,7 +10,7 @@ import type {
   PlexPlaylist,
   PlexSession,
   PlexTimeline,
-} from './types.js';
+} from './types';
 
 export class PlexAPIError extends Error {
   constructor(message: string) {

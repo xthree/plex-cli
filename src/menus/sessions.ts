@@ -3,10 +3,10 @@
  */
 
 import inquirer from 'inquirer';
-import { sessionTable, mediaTable, printError, printInfo, printHeader } from '../display.js';
-import { runMediaMenu } from './media.js';
-import type { PlexClient } from '../api.js';
-import type { PlexItem } from '../types.js';
+import { sessionTable, mediaTable, printError, printInfo, printHeader } from '../display';
+import { runMediaMenu } from './media';
+import type { PlexClient } from '../api';
+import type { PlexItem } from '../types';
 
 export async function runSessionsMenu(client: PlexClient): Promise<void> {
   printHeader('Active Sessions');

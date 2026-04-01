@@ -8,8 +8,8 @@ import inquirer from 'inquirer';
 import chalk from 'chalk';
 import Table from 'cli-table3';
 
-import { PlexClient } from './api.js';
-import { Config } from './config.js';
+import { PlexClient } from './api';
+import { Config } from './config';
 import {
   mediaTable,
   clientTable,
@@ -17,17 +17,17 @@ import {
   printError,
   printSuccess,
   printInfo,
-} from './display.js';
-import type { Profile } from './types.js';
+} from './display';
+import type { Profile } from './types';
 
 // Menus (imported lazily to keep --help fast)
 async function loadMenus() {
   const [search, libs, pl, sess, settings] = await Promise.all([
-    import('./menus/search.js'),
-    import('./menus/libraries.js'),
-    import('./menus/playlists.js'),
-    import('./menus/sessions.js'),
-    import('./menus/settings.js'),
+    import('./menus/search'),
+    import('./menus/libraries'),
+    import('./menus/playlists'),
+    import('./menus/sessions'),
+    import('./menus/settings'),
   ]);
   return { search, libs, pl, sess, settings };
 }

@@ -3,10 +3,10 @@
  */
 
 import inquirer from 'inquirer';
-import { mediaTable, printError, printSuccess, printInfo, printHeader } from '../display.js';
-import { runMediaMenu } from './media.js';
-import type { PlexClient } from '../api.js';
-import type { PlexItem, PlexPlaylist } from '../types.js';
+import { mediaTable, printError, printSuccess, printInfo, printHeader } from '../display';
+import { runMediaMenu } from './media';
+import type { PlexClient } from '../api';
+import type { PlexItem, PlexPlaylist } from '../types';
 
 export async function runPlaylistsMenu(client: PlexClient): Promise<void> {
   while (true) {
@@ -20,7 +20,7 @@ export async function runPlaylistsMenu(client: PlexClient): Promise<void> {
     }
 
     type ChoiceValue = PlexPlaylist | '__create__' | '__back__';
-    const choices: Array<{ name: string; value: ChoiceValue } | ReturnType<typeof inquirer.Separator>> = [
+    const choices: Array<{ name: string; value: ChoiceValue } | InstanceType<typeof inquirer.Separator>> = [
       ...playlists.map((p) => ({
         name: `${p.title ?? '?'} (${p.leafCount ?? 0} items)`,
         value: p as ChoiceValue,

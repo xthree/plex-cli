@@ -3,9 +3,9 @@
  */
 
 import readline from 'readline';
-import { fmtDuration, progressBar } from '../display.js';
-import type { PlexClient } from '../api.js';
-import type { PlexTimeline } from '../types.js';
+import { fmtDuration, progressBar } from '../display';
+import type { PlexClient } from '../api';
+import type { PlexTimeline } from '../types';
 
 const POLL_INTERVAL = 2000;
 
