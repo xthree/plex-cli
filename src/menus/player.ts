@@ -25,14 +25,19 @@ export async function runPlayerView(
   }
 
   const timeline: PlexTimeline = { ...initialTimeline };
+  let polling = false;
 
   // Poll timeline in background
   const pollTimer = setInterval(async () => {
+    if (polling) return;
+    polling = true;
     try {
       const tl = await client.getTimeline(clientAddress, clientPort);
       if (tl && Object.keys(tl).length) Object.assign(timeline, tl);
     } catch {
       // ignore poll errors
+    } finally {
+      polling = false;
     }
   }, POLL_INTERVAL);
 
