@@ -57,7 +57,7 @@ export async function runPlayerView(
     const icon = stateIcon[state] ?? '?';
     const offset = parseInt(String(timeline.viewOffset ?? 0), 10);
     const duration = parseInt(String(timeline.duration ?? 0), 10);
-    const bar = progressBar(offset, duration, 44);
+    const bar = progressBar(offset, duration, Math.max(20, (process.stdout.columns ?? 80) - 36));
 
     const lines = [
       `  ${icon}  ${fullTitle}`,
