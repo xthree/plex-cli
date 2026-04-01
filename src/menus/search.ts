@@ -3,7 +3,7 @@
  */
 
 import inquirer from 'inquirer';
-import { mediaTable, clientTable, printError, printInfo, printHeader } from '../display';
+import { mediaTable, clientTable, printError, printInfo, printHeader, fmtItemLabel } from '../display';
 import { runMediaMenu } from './media';
 import { runClientMenu } from './client';
 import type { PlexClient } from '../api';
@@ -38,7 +38,7 @@ export async function runSearchMedia(client: PlexClient): Promise<void> {
       message: 'Select an item:',
       choices: [
         ...results.map((r) => ({
-          name: `${r.title ?? '?'} (${r.type ?? '?'}, ${r.year ?? ''})`,
+          name: `${fmtItemLabel(r)} (${r.type ?? '?'}, ${r.year ?? ''})`,
           value: r,
         })),
         { name: '← Back', value: null },

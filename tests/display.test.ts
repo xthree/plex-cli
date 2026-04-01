@@ -2,7 +2,7 @@
  * Tests for display helper functions.
  */
 
-import { fmtDuration, fmtYear, fmtType, fmtWatched, progressBar } from '../src/display';
+import { fmtDuration, fmtYear, fmtType, fmtWatched, fmtItemLabel, progressBar } from '../src/display';
 import type { PlexItem } from '../src/types';
 
 describe('fmtDuration', () => {
@@ -53,6 +53,25 @@ describe('fmtWatched', () => {
   });
   test('in progress returns play icon', () => {
     expect(fmtWatched({ viewCount: 0, viewOffset: 5000 })).toBe('▶');
+  });
+});
+
+describe('fmtItemLabel', () => {
+  test('returns title for non-episode items', () => {
+    expect(fmtItemLabel({ type: 'movie', title: 'Inception' })).toBe('Inception');
+  });
+  test('returns title for episode without grandparentTitle', () => {
+    expect(fmtItemLabel({ type: 'episode', title: 'Pilot' })).toBe('Pilot');
+  });
+  test('prefixes show name for episode with grandparentTitle', () => {
+    expect(fmtItemLabel({ type: 'episode', title: 'Pilot', grandparentTitle: 'Breaking Bad' }))
+      .toBe('Breaking Bad – Pilot');
+  });
+  test('falls back to name field when title is missing', () => {
+    expect(fmtItemLabel({ type: 'movie', name: 'Some Movie' })).toBe('Some Movie');
+  });
+  test('returns (no title) when both title and name are missing', () => {
+    expect(fmtItemLabel({})).toBe('(no title)');
   });
 });
 
