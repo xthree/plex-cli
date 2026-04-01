@@ -66,7 +66,13 @@ export function mediaTable(items: PlexItem[], title = ''): void {
   items.forEach((item, i) => {
     const itemTitle = (item.title ?? item.name ?? '(no title)').substring(0, 33);
     const rating = item.rating ?? item.userRating ?? '';
-    const ratingStr = rating ? parseFloat(String(rating)).toFixed(1) : '';
+    let ratingStr = '';
+    if (rating !== '' && rating != null) {
+      const ratingNum = Number.parseFloat(String(rating));
+      if (Number.isFinite(ratingNum)) {
+        ratingStr = ratingNum.toFixed(1);
+      }
+    }
     table.push([
       String(i + 1),
       itemTitle,
