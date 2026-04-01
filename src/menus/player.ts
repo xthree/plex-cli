@@ -77,7 +77,7 @@ export async function runPlayerView(
   process.stdin.resume();
 
   await new Promise<void>((resolve) => {
-    process.stdin.on('keypress', async (_str: string, key: { name: string; ctrl?: boolean; sequence?: string }) => {
+    const keypressHandler = async (_str: string, key: { name: string; ctrl?: boolean; sequence?: string }) => {
       const k = key?.name ?? _str;
 
       if (k === 'q' || (key?.ctrl && k === 'c')) {
@@ -106,14 +106,17 @@ export async function runPlayerView(
       } catch {
         // swallow errors so the view stays open
       }
-    });
-  });
+    };
 
-  function cleanup(): void {
-    clearInterval(pollTimer);
-    clearInterval(renderTimer);
-    process.stdin.setRawMode(false);
-    process.stdin.pause();
-    console.log('\n');
-  }
+    process.stdin.on('keypress', keypressHandler);
+
+    function cleanup(): void {
+      process.stdin.off('keypress', keypressHandler);
+      clearInterval(pollTimer);
+      clearInterval(renderTimer);
+      process.stdin.setRawMode(false);
+      process.stdin.pause();
+      console.log('\n');
+    }
+  });
 }
