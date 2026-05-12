@@ -1,12 +1,9 @@
 /**
  * Tests for the library XLSX export helpers in src/menus/export.ts.
- *
- * We test the pure helper functions by importing them through a
- * re-export shim; the workbook-writing path that needs a real Plex
- * server is exercised by integration tests elsewhere.
  */
 
 import { describe, it, expect } from '@jest/globals';
+import os from 'node:os';
 
 // ---------------------------------------------------------------------------
 // Helpers duplicated here to avoid touching the private internals of export.ts
@@ -100,12 +97,10 @@ describe('detectHdr', () => {
 });
 
 // ---------------------------------------------------------------------------
-// Sheet name sanitisation
+// sanitiseSheetName — imported from the module under test
 // ---------------------------------------------------------------------------
 
-function sanitiseSheetName(raw: string): string {
-  return raw.replace(/[\\/*?:\[\]]/g, '').slice(0, 31);
-}
+import { sanitiseSheetName } from '../src/menus/export';
 
 describe('sanitiseSheetName', () => {
   it('strips forbidden Excel sheet name characters', () => {
@@ -166,7 +161,7 @@ import { jest } from '@jest/globals';
 
 describe('exportLibrarySpreadsheet', () => {
   it('writes a file and resolves to the output path', async () => {
-    const tmpPath = `/tmp/plex-cli-test-export-${Date.now()}.xlsx`;
+    const tmpPath = `${os.tmpdir()}/plex-cli-test-export-${Date.now()}.xlsx`;
 
     // Minimal mock PlexClient
     const mockClient = {
