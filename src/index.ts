@@ -22,14 +22,15 @@ import type { Profile } from './types';
 
 // Menus (imported lazily to keep --help fast)
 async function loadMenus() {
-  const [search, libs, pl, sess, settings] = await Promise.all([
+  const [search, libs, pl, sess, settings, hass] = await Promise.all([
     import('./menus/search'),
     import('./menus/libraries'),
     import('./menus/playlists'),
     import('./menus/sessions'),
     import('./menus/settings'),
+    import('./menus/hass'),
   ]);
-  return { search, libs, pl, sess, settings };
+  return { search, libs, pl, sess, settings, hass };
 }
 
 const VERSION = '0.1.0';
@@ -77,7 +78,7 @@ function requireClient(
 // ---------------------------------------------------------------------------
 
 async function runInteractive(client: PlexClient, config: Config): Promise<void> {
-  const { search, libs, pl, sess, settings } = await loadMenus();
+  const { search, libs, pl, sess, settings, hass } = await loadMenus();
 
   console.log(
     '\n' + chalk.cyan.bold('┌─────────────────────────────┐') +
@@ -101,6 +102,8 @@ async function runInteractive(client: PlexClient, config: Config): Promise<void>
           { name: '📺 Active Sessions', value: 'sessions' },
           { name: 'ℹ️  Server Info', value: 'server_info' },
           new inquirer.Separator(),
+          { name: '🏠 Generate Home Assistant automation', value: 'ha_automation' },
+          new inquirer.Separator(),
           { name: '⚙️  Manage profiles', value: 'profiles' },
           new inquirer.Separator(),
           { name: '🚪 Quit', value: 'quit' },
@@ -118,6 +121,7 @@ async function runInteractive(client: PlexClient, config: Config): Promise<void>
     else if (action === 'playlists')      await pl.runPlaylistsMenu(client);
     else if (action === 'sessions')       await sess.runSessionsMenu(client);
     else if (action === 'server_info')    await settings.runServerInfo(client);
+    else if (action === 'ha_automation')  await hass.runHassMenu(client);
     else if (action === 'profiles')       await settings.runProfileManager(config);
   }
 }
@@ -330,5 +334,26 @@ program
       printError((err as Error).message); process.exit(1);
     }
   });
+
+program
+  .command('ha-automation <query>')
+  .description('Generate a Home Assistant automation YAML to trigger Plex playback')
+  .option('--player <entity>', 'HA media_player entity ID', 'media_player.plex_player')
+  .option('--output <path>', 'Output file path (default: homeassistant/<title>.yaml)')
+  .option('--resume', 'Resume TV show from On Deck (default: true for shows)')
+  .option('--no-resume', 'Start TV show from S01E01 instead of resuming')
+  .option('--type <type>', 'Filter results by type (movie, show, episode, track, …)')
+  .action(
+    async (
+      query: string,
+      opts: { player?: string; output?: string; resume?: boolean; type?: string },
+      cmd: Command
+    ) => {
+      const config = new Config();
+      const client = requireClient(cmd.parent!.opts(), config);
+      const { generateHassAutomation } = await import('./menus/hass');
+      await generateHassAutomation(client, query, opts);
+    }
+  );
 
 await program.parseAsync(process.argv);

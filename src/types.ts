@@ -26,6 +26,12 @@ export interface PlexItem {
   playlistType?: string;
   grandparentTitle?: string;
   parentTitle?: string;
+  /** Episode number within its season (1-based). */
+  index?: number;
+  /** Season number (1-based) for episodes. */
+  parentIndex?: number;
+  /** Library section title the item belongs to. */
+  librarySectionTitle?: string;
   Genre?: Array<{ tag: string }>;
   Director?: Array<{ tag: string }>;
   Writer?: Array<{ tag: string }>;
