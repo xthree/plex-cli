@@ -4,7 +4,7 @@
 
 import chalk from 'chalk';
 import Table from 'cli-table3';
-import type { PlexItem, PlexClientDevice, PlexSession } from './types';
+import type { PlexItem, PlexClientDevice, PlexSession, PlexMediaPart, PlexStream } from './types';
 
 // ---------------------------------------------------------------------------
 // Formatting helpers
@@ -56,6 +56,60 @@ export function fmtItemLabel(item: PlexItem): string {
     return `${item.grandparentTitle} – ${t}`;
   }
   return t;
+}
+
+/** Format a byte count as a human-readable string (B / KB / MB / GB / TB). */
+export function fmtFileSize(bytes: number): string {
+  if (bytes < 1024) return `${bytes} B`;
+  if (bytes < 1024 ** 2) return `${(bytes / 1024).toFixed(1)} KB`;
+  if (bytes < 1024 ** 3) return `${(bytes / 1024 ** 2).toFixed(1)} MB`;
+  if (bytes < 1024 ** 4) return `${(bytes / 1024 ** 3).toFixed(2)} GB`;
+  return `${(bytes / 1024 ** 4).toFixed(2)} TB`;
+}
+
+/** Return a human-readable resolution label from a Media object. */
+function fmtResolution(media: PlexMediaPart): string {
+  if (media.width && media.height) return `${media.width}×${media.height}`;
+  const res = String(media.videoResolution ?? '').toLowerCase();
+  const labels: Record<string, string> = {
+    '4k': '4K (2160p)', '2160': '4K (2160p)', '1440': '1440p',
+    '1080': '1080p', '720': '720p', '480': '480p', '360': '360p',
+  };
+  return labels[res] ?? (res ? `${res}p` : '');
+}
+
+/** Detect HDR format tags from a video stream. */
+function detectHDR(stream: PlexStream): string[] {
+  const tags: string[] = [];
+  const trc = String(stream.colorTrc ?? '').toLowerCase();
+  const dt = String(stream.displayTitle ?? '').toLowerCase();
+
+  const hasDovi =
+    stream.DOVIPresent ||
+    stream.DOVIProfile != null ||
+    stream.codec === 'dvh1' ||
+    stream.codec === 'dvhe' ||
+    dt.includes('dolby vision');
+  if (hasDovi) tags.push('Dolby Vision');
+
+  if (trc === 'smpte2094-40' || dt.includes('hdr10+')) {
+    tags.push('HDR10+');
+  } else if (trc === 'smpte2084' || dt.includes('hdr10')) {
+    tags.push('HDR10');
+  } else if (trc === 'arib-std-b67' || dt.includes('hlg')) {
+    tags.push('HLG');
+  } else if (stream.colorPrimaries === 'bt2020' || /\bhdr\b/.test(dt)) {
+    if (!hasDovi) tags.push('HDR');
+  }
+  return tags;
+}
+
+/** Return true when the audio stream carries Dolby Atmos. */
+function isAtmos(stream: PlexStream): boolean {
+  return (
+    String(stream.audioProfile ?? '').toLowerCase().includes('atmos') ||
+    String(stream.displayTitle ?? '').toLowerCase().includes('atmos')
+  );
 }
 
 // ---------------------------------------------------------------------------
@@ -188,6 +242,88 @@ export function metadataPanel(item: PlexItem): void {
     .map((r) => r.tag)
     .join(', ');
   if (cast) lines.push(chalk.cyan('Cast:     ') + cast);
+
+  // Technical section
+  const media = (item.Media ?? [])[0];
+  if (media) {
+    const part = (media.Part ?? [])[0];
+    const streams = part?.Stream ?? [];
+    const videoStreams = streams.filter((s) => s.streamType === 1);
+    const audioStreams = streams.filter((s) => s.streamType === 2);
+    const subStreams = streams.filter((s) => s.streamType === 3);
+
+    const techLines: string[] = ['', chalk.cyan('Technical:')];
+
+    const container = (media.container ?? part?.container ?? '').toUpperCase();
+    if (container) techLines.push(chalk.cyan('  Container:  ') + container);
+
+    const resolution = fmtResolution(media);
+    const vs = videoStreams[0];
+    if (vs || resolution) {
+      const codecStr = vs?.displayTitle ?? (media.videoCodec ?? '').toUpperCase();
+      const hdrTags = vs ? detectHDR(vs) : [];
+      const hdrStr = hdrTags.length
+        ? ' ' + hdrTags.map((t) => chalk.yellow(t)).join(' + ')
+        : '';
+      const profile = vs?.profile ? ` (${vs.profile})` : '';
+      techLines.push(
+        chalk.cyan('  Video:      ') +
+          [codecStr + profile, resolution].filter(Boolean).join(', ') +
+          hdrStr
+      );
+    }
+
+    if (media.aspectRatio) {
+      const ar = media.aspectRatio;
+      const arStr = typeof ar === 'number' ? `${ar}:1` : String(ar);
+      techLines.push(chalk.cyan('  Aspect:     ') + arStr);
+    }
+
+    if (media.bitrate) {
+      techLines.push(chalk.cyan('  Bitrate:    ') + media.bitrate.toLocaleString() + ' kbps');
+    }
+
+    const fps = vs?.frameRate;
+    if (fps != null && fps !== '') {
+      techLines.push(chalk.cyan('  Frame rate: ') + String(fps) + ' fps');
+    }
+
+    if (audioStreams.length > 0) {
+      audioStreams.forEach((as, i) => {
+        const trackTitle = as.displayTitle ?? (as.codec ?? '').toUpperCase();
+        const lang = as.language ? ` [${as.language}]` : '';
+        const atmos = isAtmos(as) ? chalk.magenta(' ✦ Atmos') : '';
+        const label = i === 0 ? chalk.cyan('  Audio:      ') : '              ';
+        techLines.push(label + trackTitle + lang + atmos);
+      });
+    } else if (media.audioCodec) {
+      const audioStr =
+        media.audioCodec.toUpperCase() + (media.audioChannels ? ` ${media.audioChannels}ch` : '');
+      const atmos = (media.audioProfile ?? '').toLowerCase().includes('atmos')
+        ? chalk.magenta(' ✦ Atmos')
+        : '';
+      techLines.push(chalk.cyan('  Audio:      ') + audioStr + atmos);
+    }
+
+    if (subStreams.length > 0) {
+      const langs = [
+        ...new Set(subStreams.map((s) => s.language ?? s.languageTag ?? s.codec ?? '?')),
+      ].join(', ');
+      techLines.push(chalk.cyan('  Subtitles:  ') + langs);
+    }
+
+    if (part?.file) {
+      techLines.push(chalk.cyan('  File:       ') + part.file);
+    }
+
+    if (part?.size) {
+      techLines.push(chalk.cyan('  Size:       ') + fmtFileSize(part.size));
+    }
+
+    if (techLines.length > 2) {
+      lines.push(...techLines);
+    }
+  }
 
   const border = '─'.repeat(60);
   console.log('\n' + chalk.cyan(border));

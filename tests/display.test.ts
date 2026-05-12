@@ -2,7 +2,7 @@
  * Tests for display helper functions.
  */
 
-import { fmtDuration, fmtYear, fmtType, fmtWatched, fmtItemLabel, progressBar } from '../src/display';
+import { fmtDuration, fmtYear, fmtType, fmtWatched, fmtItemLabel, progressBar, fmtFileSize } from '../src/display';
 import type { PlexItem } from '../src/types';
 
 describe('fmtDuration', () => {
@@ -87,5 +87,22 @@ describe('progressBar', () => {
   });
   test('handles zero duration gracefully', () => {
     expect(() => progressBar(0, 0)).not.toThrow();
+  });
+});
+
+describe('fmtFileSize', () => {
+  test.each<[number, string]>([
+    [0,              '0 B'],
+    [512,            '512 B'],
+    [1_023,          '1023 B'],
+    [1_024,          '1.0 KB'],
+    [1_536,          '1.5 KB'],
+    [1_048_576,      '1.0 MB'],
+    [1_572_864,      '1.5 MB'],
+    [1_073_741_824,  '1.00 GB'],
+    [5_368_709_120,  '5.00 GB'],
+    [1_099_511_627_776, '1.00 TB'],
+  ])('fmtFileSize(%i) === %s', (bytes, expected) => {
+    expect(fmtFileSize(bytes)).toBe(expected);
   });
 });
