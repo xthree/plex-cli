@@ -34,10 +34,64 @@ export interface PlexItem {
   [key: string]: unknown;
 }
 
+/** An individual audio/video/subtitle stream within a media file. */
+export interface PlexStream {
+  streamType?: number;        // 1 = video, 2 = audio, 3 = subtitle
+  codec?: string;
+  displayTitle?: string;
+  language?: string;
+  languageTag?: string;
+  bitrate?: number;
+  width?: number;
+  height?: number;
+  frameRate?: number | string;
+  colorPrimaries?: string;
+  colorSpace?: string;
+  colorRange?: string;
+  /** "smpte2084" = HDR10, "arib-std-b67" = HLG, "smpte2094-40" = HDR10+ */
+  colorTrc?: string;
+  DOVIPresent?: number | boolean;
+  DOVIProfile?: number;
+  DOVILevel?: number;
+  profile?: string;
+  channels?: number;
+  audioChannelLayout?: string;
+  /** "atmos" when Dolby Atmos is present */
+  audioProfile?: string;
+  samplingRate?: number;
+  selected?: number | boolean;
+  forced?: number | boolean;
+  [key: string]: unknown;
+}
+
+/** A physical file part that contains one or more streams. */
+export interface PlexFilePart {
+  id?: string;
+  key?: string;
+  duration?: number;
+  file?: string;
+  size?: number;
+  container?: string;
+  Stream?: PlexStream[];
+  [key: string]: unknown;
+}
+
+/** A media encoding (there may be multiple versions of the same item). */
 export interface PlexMediaPart {
   id?: string;
   videoResolution?: string;
   bitrate?: number;
+  width?: number;
+  height?: number;
+  aspectRatio?: number | string;
+  container?: string;
+  videoCodec?: string;
+  audioCodec?: string;
+  audioChannels?: number;
+  /** "atmos" when Dolby Atmos audio is present */
+  audioProfile?: string;
+  videoProfile?: string;
+  Part?: PlexFilePart[];
   [key: string]: unknown;
 }
 
