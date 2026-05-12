@@ -18,7 +18,8 @@ describe('slugify', () => {
   test('truncates at 60 chars', () => {
     expect(slugify('a'.repeat(100))).toHaveLength(60);
   });
-  test('handles non-ASCII gracefully', () => {
+  test('handles non-ASCII gracefully (replaces with underscore)', () => {
+    // 'é' is a single non-ASCII char, replaced by one underscore → 'am_lie'
     expect(slugify('Amélie')).toBe('am_lie');
   });
 });
