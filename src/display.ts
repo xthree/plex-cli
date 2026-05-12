@@ -284,7 +284,7 @@ export function metadataPanel(item: PlexItem): void {
     }
 
     const fps = vs?.frameRate;
-    if (fps != null && fps !== '') {
+    if (fps != null && String(fps) !== '') {
       techLines.push(chalk.cyan('  Frame rate: ') + String(fps) + ' fps');
     }
 
@@ -307,7 +307,7 @@ export function metadataPanel(item: PlexItem): void {
 
     if (subStreams.length > 0) {
       const langs = [
-        ...new Set(subStreams.map((s) => s.language ?? s.languageTag ?? s.codec ?? '?')),
+        ...new Set(subStreams.map((s) => s.language ?? s.languageTag ?? s.codec ?? 'Unknown')),
       ].join(', ');
       techLines.push(chalk.cyan('  Subtitles:  ') + langs);
     }
