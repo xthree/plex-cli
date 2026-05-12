@@ -126,4 +126,9 @@ describe('renderYaml', () => {
     const yaml = renderYaml({ ...base, alias: 'Play "Inception" on Plex' });
     expect(yaml).toContain('\\"Inception\\"');
   });
+
+  test('escapes backslashes in alias', () => {
+    const yaml = renderYaml({ ...base, alias: 'Play C:\\Movies on Plex' });
+    expect(yaml).toContain('C:\\\\Movies');
+  });
 });
