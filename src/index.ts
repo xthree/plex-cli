@@ -22,7 +22,7 @@ import type { Profile } from './types';
 
 // Menus (imported lazily to keep --help fast)
 async function loadMenus() {
-  const [search, libs, pl, sess, settings, hass] = await Promise.all([
+  const [search, libs, pl, sess, settings, hassMenu] = await Promise.all([
     import('./menus/search'),
     import('./menus/libraries'),
     import('./menus/playlists'),
@@ -30,7 +30,7 @@ async function loadMenus() {
     import('./menus/settings'),
     import('./menus/hass'),
   ]);
-  return { search, libs, pl, sess, settings, hass };
+  return { search, libs, pl, sess, settings, hassMenu };
 }
 
 const VERSION = '0.1.0';
@@ -78,7 +78,7 @@ function requireClient(
 // ---------------------------------------------------------------------------
 
 async function runInteractive(client: PlexClient, config: Config): Promise<void> {
-  const { search, libs, pl, sess, settings, hass } = await loadMenus();
+  const { search, libs, pl, sess, settings, hassMenu } = await loadMenus();
 
   console.log(
     '\n' + chalk.cyan.bold('┌─────────────────────────────┐') +
@@ -121,7 +121,7 @@ async function runInteractive(client: PlexClient, config: Config): Promise<void>
     else if (action === 'playlists')      await pl.runPlaylistsMenu(client);
     else if (action === 'sessions')       await sess.runSessionsMenu(client);
     else if (action === 'server_info')    await settings.runServerInfo(client);
-    else if (action === 'ha_automation')  await hass.runHassMenu(client);
+    else if (action === 'ha_automation')  await hassMenu.runHassMenu(client);
     else if (action === 'profiles')       await settings.runProfileManager(config);
   }
 }
