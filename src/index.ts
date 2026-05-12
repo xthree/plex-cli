@@ -104,7 +104,7 @@ async function runInteractive(client: PlexClient, config: Config): Promise<void>
           { name: 'ℹ️  Server Info', value: 'server_info' },
           new inquirer.Separator(),
           { name: '🏠 Generate Home Assistant automation', value: 'ha_automation' },
-          { name: '📊 Export library spreadsheet (XLSX)', value: 'export_csv' },
+          { name: '📊 Export library spreadsheet (XLSX)', value: 'export_spreadsheet' },
           new inquirer.Separator(),
           { name: '⚙️  Manage profiles', value: 'profiles' },
           new inquirer.Separator(),
@@ -123,8 +123,8 @@ async function runInteractive(client: PlexClient, config: Config): Promise<void>
     else if (action === 'playlists')      await pl.runPlaylistsMenu(client);
     else if (action === 'sessions')       await sess.runSessionsMenu(client);
     else if (action === 'server_info')    await settings.runServerInfo(client);
-    else if (action === 'ha_automation')  await hassMenu.runHassMenu(client);
-    else if (action === 'export_csv')     await exportMenu.runExportMenu(client);
+    else if (action === 'ha_automation')         await hassMenu.runHassMenu(client);
+    else if (action === 'export_spreadsheet')    await exportMenu.runExportMenu(client);
     else if (action === 'profiles')       await settings.runProfileManager(config);
   }
 }
@@ -360,7 +360,7 @@ program
   );
 
 program
-  .command('export-csv')
+  .command('export-spreadsheet')
   .description('Export all libraries to an XLSX spreadsheet (one sheet per library)')
   .option('-o, --output <path>', 'Output file path', 'plex-library-export.xlsx')
   .action(async (opts: { output: string }, cmd: Command) => {

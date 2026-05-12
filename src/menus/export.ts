@@ -170,6 +170,15 @@ function extractTechRow(item: PlexItem): TechRow {
 }
 
 // ---------------------------------------------------------------------------
+// Sheet name helper (exported for tests)
+// ---------------------------------------------------------------------------
+
+/** Strip characters forbidden in Excel sheet names and cap at 31 chars. */
+export function sanitiseSheetName(raw: string): string {
+  return raw.replace(/[\\/*?:\[\]]/g, '').slice(0, 31);
+}
+
+// ---------------------------------------------------------------------------
 // Sheet builders
 // ---------------------------------------------------------------------------
 
@@ -324,9 +333,7 @@ export async function exportLibrarySpreadsheet(
     const libKey = lib.key ?? '';
     const libTitle = lib.title ?? `Library ${libKey}`;
     const libType = lib.type ?? '';
-
-    // Sheet names max 31 chars; strip invalid chars
-    const sheetName = libTitle.replace(/[\\/*?:\[\]]/g, '').slice(0, 31);
+    const sheetName = sanitiseSheetName(libTitle);
 
     opts.onProgress?.(libIndex, libs.length, libTitle);
 
