@@ -22,15 +22,16 @@ import type { Profile } from './types';
 
 // Menus (imported lazily to keep --help fast)
 async function loadMenus() {
-  const [search, libs, pl, sess, settings, hassMenu] = await Promise.all([
+  const [search, libs, pl, sess, settings, hassMenu, exportMenu] = await Promise.all([
     import('./menus/search'),
     import('./menus/libraries'),
     import('./menus/playlists'),
     import('./menus/sessions'),
     import('./menus/settings'),
     import('./menus/hass'),
+    import('./menus/export'),
   ]);
-  return { search, libs, pl, sess, settings, hassMenu };
+  return { search, libs, pl, sess, settings, hassMenu, exportMenu };
 }
 
 const VERSION = '0.1.0';
@@ -78,7 +79,7 @@ function requireClient(
 // ---------------------------------------------------------------------------
 
 async function runInteractive(client: PlexClient, config: Config): Promise<void> {
-  const { search, libs, pl, sess, settings, hassMenu } = await loadMenus();
+  const { search, libs, pl, sess, settings, hassMenu, exportMenu } = await loadMenus();
 
   console.log(
     '\n' + chalk.cyan.bold('┌─────────────────────────────┐') +
@@ -103,6 +104,7 @@ async function runInteractive(client: PlexClient, config: Config): Promise<void>
           { name: 'ℹ️  Server Info', value: 'server_info' },
           new inquirer.Separator(),
           { name: '🏠 Generate Home Assistant automation', value: 'ha_automation' },
+          { name: '📊 Export library spreadsheet (XLSX)', value: 'export_csv' },
           new inquirer.Separator(),
           { name: '⚙️  Manage profiles', value: 'profiles' },
           new inquirer.Separator(),
@@ -122,6 +124,7 @@ async function runInteractive(client: PlexClient, config: Config): Promise<void>
     else if (action === 'sessions')       await sess.runSessionsMenu(client);
     else if (action === 'server_info')    await settings.runServerInfo(client);
     else if (action === 'ha_automation')  await hassMenu.runHassMenu(client);
+    else if (action === 'export_csv')     await exportMenu.runExportMenu(client);
     else if (action === 'profiles')       await settings.runProfileManager(config);
   }
 }
@@ -355,5 +358,31 @@ program
       await generateHassAutomation(client, query, opts);
     }
   );
+
+program
+  .command('export-csv')
+  .description('Export all libraries to an XLSX spreadsheet (one sheet per library)')
+  .option('-o, --output <path>', 'Output file path', 'plex-library-export.xlsx')
+  .action(async (opts: { output: string }, cmd: Command) => {
+    const config = new Config();
+    const client = requireClient(cmd.parent!.opts(), config);
+    const { exportLibrarySpreadsheet } = await import('./menus/export');
+    printInfo('Fetching library data — this may take a moment for large libraries…');
+    let last = '';
+    try {
+      const outPath = await exportLibrarySpreadsheet(client, {
+        output: opts.output,
+        onProgress: (_cur, _total, label) => {
+          if (label !== last) {
+            last = label;
+            process.stdout.write(`  Processing: ${label}\n`);
+          }
+        },
+      });
+      printSuccess(`Spreadsheet written to: ${outPath}`);
+    } catch (err: unknown) {
+      printError((err as Error).message); process.exit(1);
+    }
+  });
 
 await program.parseAsync(process.argv);

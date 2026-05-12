@@ -102,11 +102,17 @@ export class PlexClient {
 
   async libraryContents(
     sectionKey: string,
-    { sort = 'titleSort:asc', limit = 50, offset = 0 }: { sort?: string; limit?: number; offset?: number } = {}
+    { sort = 'titleSort:asc', limit = 50, offset = 0, type }: { sort?: string; limit?: number; offset?: number; type?: number } = {}
   ): Promise<{ items: PlexItem[]; total: number }> {
+    const params: Record<string, unknown> = {
+      sort,
+      'X-Plex-Container-Size': limit,
+      'X-Plex-Container-Start': offset,
+    };
+    if (type != null) params['type'] = type;
     const data = await this._get<{ MediaContainer?: Record<string, unknown> }>(
       `/library/sections/${sectionKey}/all`,
-      { sort, 'X-Plex-Container-Size': limit, 'X-Plex-Container-Start': offset }
+      params
     );
     const mc = data?.MediaContainer ?? {};
     const items =
@@ -118,6 +124,33 @@ export class PlexClient {
       [];
     const total = parseInt(String(mc.totalSize ?? mc.size ?? items.length), 10);
     return { items, total };
+  }
+
+  /**
+   * Fetch ALL leaf items in a library section in one request.
+   * For show libraries, use type=4 to get episodes directly with their Media data.
+   * For movie libraries, use type=1; for music, use type=10.
+   */
+  async libraryAllLeaves(
+    sectionKey: string,
+    type: number
+  ): Promise<PlexItem[]> {
+    const PAGE = 500;
+    const all: PlexItem[] = [];
+    let offset = 0;
+
+    while (true) {
+      const { items, total } = await this.libraryContents(sectionKey, {
+        sort: 'titleSort:asc',
+        limit: PAGE,
+        offset,
+        type,
+      });
+      all.push(...items);
+      offset += items.length;
+      if (items.length === 0 || all.length >= total) break;
+    }
+    return all;
   }
 
   // ---------------------------------------------------------------------------
