@@ -1,0 +1,25 @@
+# Node.js
+node_modules/
+npm-debug.log*
+.npm
+
+# Build artifacts
+dist/
+*.js.map
+
+# Test coverage
+coverage/
+.nyc_output/
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*~
+
+# macOS
+.DS_Store
+
+# Secrets / local config
+.env
+*.env.local
